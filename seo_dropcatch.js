@@ -5,7 +5,7 @@ let errorCount = 0;
 const fetchDomainDropCatch = async () => {
   try {
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 0,
       args: [
         "--no-sandbox",
@@ -107,11 +107,11 @@ const fetchDomainDropCatch = async () => {
 
       const results = await checkDomainInDB(Domain);
       if (results.length > 0) {
-        const Wait = Math.floor(Math.random() * 6000) + 3000;
+        const Wait = Math.floor(Math.random() * 6000) + 4000;
         await new Promise((resolve) => setTimeout(resolve, Wait));
         console.log(`${Domain} -> Exists in DB`);
       } else {
-        const Wait = Math.floor(Math.random() * 6000) + 3000;
+        const Wait = Math.floor(Math.random() * 6000) + 4000;
         await new Promise((resolve) => setTimeout(resolve, Wait));
         console.log(`${Domain} -> Waiting insert to DB...`);
         await insertDB(Domain, HighBid);
@@ -138,7 +138,7 @@ const fetchDomainDropCatch = async () => {
       errorCount = 0;
     }
   } finally {
-    setTimeout(fetchDomainDropCatch, 5000);
+    setTimeout(fetchDomainDropCatch, 60000);
   }
 };
 
@@ -178,7 +178,7 @@ const insertDB = async (Domain, HighBid) => {
   const URL = `${UrlAPI}/dr/create`;
 
   const payload = {
-    domain: Domain,
+    domain: Domain.toLowerCase(),
     highBid: HighBid,
   };
 

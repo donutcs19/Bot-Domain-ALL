@@ -24,7 +24,7 @@ const EndDate = EDate(1);
 
 const fetchDomainsAndInsert = async () => {
   try {
-    console;
+    
     const response = await fetch(
       // "https://auctions.godaddy.com/beta/findApiProxy/v4/aftermarket/find/auction/recommend?endTimeAfter=2024-11-02T09%3A20%3A45.599Z&endTimeBefore=2024-11-03T09%3A20%3A45.000Z&minAge=10&paginationSize=1000&paginationStart=0&tldIncludeList=com%2Cinfo%2Corg%2Cnet&typeIncludeList=16%2C38&useSemanticSearch=true"
       `https://auctions.godaddy.com/beta/findApiProxy/v4/aftermarket/find/auction/recommend?endTimeAfter=${StartDate}T13%3A53%3A52.139Z&endTimeBefore=${EndDate}T13%3A53%3A52.000Z&minAge=10&paginationSize=1000&paginationStart=0&tldIncludeList=com%2Corg%2Cnet&typeIncludeList=16%2C38&useSemanticSearch=true`
@@ -40,11 +40,11 @@ const fetchDomainsAndInsert = async () => {
 
       const results = await checkDomainInDB(domain, price);
       if (results.length > 0) {
-        const Wait = Math.floor(Math.random() * 6000) + 3000;
+        const Wait = Math.floor(Math.random() * 6000) + 4000;
         await new Promise((resolve) => setTimeout(resolve, Wait));
         console.log(`${domain} -> Exists in DB`);
       } else {
-        const Wait = Math.floor(Math.random() * 6000) + 3000;
+        const Wait = Math.floor(Math.random() * 6000) + 4000;
         await new Promise((resolve) => setTimeout(resolve, Wait));
         console.log(`${domain} -> Waiting insert to DB...`);
         await InsertDB(domain, price);
@@ -107,7 +107,7 @@ const InsertDB = async (domain, price) => {
   const URL = `${UrlAPI}/go/create`;
 
   const payload = {
-    domain: domain,
+    domain: domain.toLowerCase(),
     highBid: price,
   };
 

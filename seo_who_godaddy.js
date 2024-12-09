@@ -62,7 +62,7 @@ fetchDomainsAndInsert();
 //Start to scraper
 const scrapeDomainData = async (domain, id) => {
   const browserSeo = await puppeteer.launch({
-    headless: true,
+    headless: false,
     slowMo: 0,
     args: [
       "--no-sandbox",
@@ -79,27 +79,10 @@ const scrapeDomainData = async (domain, id) => {
   });
   const pageSeo = await browserSeo.newPage();
 
-  await pageSeo.goto("https://who.is");
+  await pageSeo.goto(`https://sg.godaddy.com/whois/results.aspx?domainName=${domain}`);
 
   await pageSeo.waitForSelector(
-    "#domainSearchForm > div > div.col-12.col-md-6.col-lg-4.pe-md-0 > input"
-  );
-  const WaitInput = Math.floor(Math.random() * 3000) + 1000;
-  await new Promise((resolve) => setTimeout(resolve, WaitInput));
-  const delayDomain = Math.floor(Math.random() * 200) + 150;
-  await pageSeo.type(
-    "#domainSearchForm > div > div.col-12.col-md-6.col-lg-4.pe-md-0 > input",
-    `${domain}`,
-    { delay: delayDomain }
-  );
-
-  const WaitClick = Math.floor(Math.random() * 4000) + 2000;
-  await new Promise((resolve) => setTimeout(resolve, WaitClick));
-  await pageSeo.click(
-    `#domainSearchForm > div > div.col-auto.ps-md-1 > button`
-  );
-  await pageSeo.waitForSelector(
-    "body > div:nth-child(7) > div.container-lg > div:nth-child(5) > div.col-md-8.queryResponseContainer > div:nth-child(4) > div > div:nth-child(1) > div.col-8.queryResponseBodyValue"
+    "#domain-information-reveal > div > div > span:nth-child(6)"
   );
 
   const Who = await pageSeo.evaluate(() => {
@@ -112,21 +95,21 @@ const scrapeDomainData = async (domain, id) => {
         : "N/A";
     };
     const Expires_On = getInnerTextWho(
-      "body > div:nth-child(7) > div.container-lg > div:nth-child(5) > div.col-md-8.queryResponseContainer > div:nth-child(4) > div > div:nth-child(1) > div.col-8.queryResponseBodyValue"
+      "#domain-information-reveal > div > div > span:nth-child(8)"
     );
     const Registered_On = getInnerTextWho(
-      "body > div:nth-child(7) > div.container-lg > div:nth-child(5) > div.col-md-8.queryResponseContainer > div:nth-child(4) > div > div:nth-child(2) > div.col-8.queryResponseBodyValue"
+      "#domain-information-reveal > div > div > span:nth-child(6)"
     );
     const Updated_On = getInnerTextWho(
-      "body > div:nth-child(7) > div.container-lg > div:nth-child(5) > div.col-md-8.queryResponseContainer > div:nth-child(4) > div > div:nth-child(3) > div.col-8.queryResponseBodyValue"
+      "#domain-information-reveal > div > div > span:nth-child(10)"
     );
     return { Expires_On, Registered_On, Updated_On };
   });
 
   const Id = id;
-  const ExpiresOn = Who.Expires_On;
-  const RegisteredOn = Who.Registered_On;
-  const UpdatedOn = Who.Updated_On;
+  const ExpiresOn = Who.Expires_On.split('T')[0];
+  const RegisteredOn = Who.Registered_On.split('T')[0];
+  const UpdatedOn = Who.Updated_On.split('T')[0];
 
   const URL = `${UrlAPI}/who/update`;
   const payload = {
